@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 import { FAQS } from '../data/travelData';
+import emailjs from '@emailjs/browser';
 
-export default function Contact() {
+const emailJsServiceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const emailJsPublicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+export default function Contact({ onAddMessage, siteContent }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -10,24 +14,63 @@ export default function Contact() {
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const [openFaq, setOpenFaq] = useState(0);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      if (!emailJsServiceId || !emailJsPublicKey) {
+        throw new Error('EmailJS is not configured. Add the service ID and public key to .env.');
+      }
+
+      await emailjs.send(
+        emailJsServiceId,
+        'template_q5wljfr',
+        {
+          name: formData.name,
+          from_name: formData.name,
+          email: formData.email,
+          from_email: formData.email,
+          reply_to: formData.email,
+          subject: formData.subject,
+          message: formData.message
+        },
+        emailJsPublicKey
+      );
+
+      setSubmitted(true);
+      onAddMessage?.({
+        id: `MSG-${Date.now()}`,
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        submittedAt: new Date().toLocaleString()
+      });
       setFormData({ name: '', email: '', subject: '', message: '' });
-      setSubmitted(false);
-    }, 4000);
+    } catch (sendError) {
+      console.error('Unable to send contact message:', sendError);
+      const errorMessage = sendError?.message || sendError?.text || '';
+      setError(errorMessage.includes('not configured')
+        ? 'Email is not configured yet. Add the EmailJS service ID and public key to the .env file.'
+        : `We could not send your message${sendError?.status ? ` (EmailJS ${sendError.status})` : ''}: ${errorMessage || 'Please check your EmailJS service, template, and public key.'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <p>WE'RE HERE TO ASSIST YOU</p>
-          <h1>Get In Touch</h1>
-          <span>Have inquiries about an itinerary or need custom vacation planning? Our specialists are available 24/7</span>
+          <p>{siteContent?.contactEyebrow || "WE'RE HERE TO ASSIST YOU"}</p>
+          <h1>{siteContent?.contactTitle || 'Get In Touch'}</h1>
+          <span>{siteContent?.contactSubtitle || 'Have inquiries about an itinerary or need custom vacation planning? Our specialists are available 24/7'}</span>
         </div>
       </div>
 
@@ -75,13 +118,18 @@ export default function Contact() {
                 textAlign: 'center'
               }}>
                 <CheckCircle2 size={36} style={{ margin: '0 auto 10px', display: 'block' }} />
-                <h3 style={{ fontSize: '18px', marginBottom: '6px' }}>Message Received!</h3>
+                <h3 style={{ fontSize: '18px', marginBottom: '6px' }}>Message Submitted</h3>
                 <p style={{ fontSize: '14px' }}>
                   Thank you for contacting TravelGo. Our senior travel advisor will review your request and get in touch shortly.
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
+                {error && (
+                  <p role="alert" style={{ color: '#b91c1c', fontSize: '14px', marginBottom: '16px' }}>
+                    {error}
+                  </p>
+                )}
                 <div className="form-group">
                   <label>Your Full Name *</label>
                   <input 
@@ -128,10 +176,11 @@ export default function Contact() {
                 <button 
                   type="submit" 
                   className="primary-button" 
+                  disabled={isSubmitting}
                   style={{ width: '100%', padding: '14px', fontSize: '15px' }}
                 >
                   <Send size={16} style={{ marginRight: '8px' }} />
-                  Send Message
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
             )}

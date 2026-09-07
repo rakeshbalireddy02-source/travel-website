@@ -2,14 +2,14 @@ import React from 'react';
 import { Compass, Globe, Heart, Shield, Award, Users, ArrowRight } from 'lucide-react';
 import AnimatedCounter from '../components/AnimatedCounter';
 
-export default function About({ navigateTo }) {
+export default function About({ navigateTo, siteContent }) {
   return (
     <div>
       <div className="page-header">
         <div>
-          <p>OUR STORY & PASSION</p>
-          <h1>About TravelGo</h1>
-          <span>Connecting curious wanderers with extraordinary, soul-stirring journeys worldwide</span>
+          <p>{siteContent?.aboutEyebrow || 'OUR STORY & PASSION'}</p>
+          <h1>{siteContent?.aboutTitle || 'About TravelGo'}</h1>
+          <span>{siteContent?.aboutSubtitle || 'Connecting curious wanderers with extraordinary, soul-stirring journeys worldwide'}</span>
         </div>
       </div>
 

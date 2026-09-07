@@ -74,6 +74,7 @@ export default function Navbar({ currentPage, setCurrentPage, currentUser, onLog
               <User size={16} color="#0f766e" />
               <span>{currentUser.name}</span>
             </div>
+            {currentUser.isAdmin && <button className="secondary-button" style={{ padding: '8px 14px', fontSize: '13px' }} onClick={() => handleNavClick('admin')}>Admin Panel</button>}
             <button className="logout-button" onClick={onLogout} title="Sign Out">
               <span className="logout-icon"><LogOut size={16} /></span>
               <span>Logout</span>

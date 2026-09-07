@@ -6,7 +6,7 @@ import {
 import { DESTINATIONS, PACKAGES, TESTIMONIALS } from '../data/travelData';
 import AnimatedCounter from '../components/AnimatedCounter';
 
-export default function Home({ onSelectDestination, onSelectPackage, navigateTo }) {
+export default function Home({ onSelectDestination, onSelectPackage, navigateTo, siteContent }) {
   const [searchLocation, setSearchLocation] = useState('');
   const [searchDate, setSearchDate] = useState('');
   const [searchGuests, setSearchGuests] = useState('2');
@@ -69,10 +69,10 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo 
       {/* HERO SECTION */}
       <section className="hero">
         <div className="hero-content">
-          <p>DISCOVER INCREDIBLE INDIA</p>
-          <h1>Explore India's Majestic Wonders & Heritage</h1>
+          <p>{siteContent?.heroEyebrow || 'DISCOVER INCREDIBLE INDIA'}</p>
+          <h1>{siteContent?.heroTitle || "Explore India's Majestic Wonders & Heritage"}</h1>
           <span>
-            Curated royal palace retreats, serene backwater cruises, snow-capped Himalayan escapes, and tropical beach getaways across India.
+            {siteContent?.heroDescription || 'Curated royal palace retreats, serene backwater cruises, snow-capped Himalayan escapes, and tropical beach getaways across India.'}
           </span>
 
           <div className="hero-buttons">
@@ -199,13 +199,14 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo 
 
       {/* POPULAR DESTINATIONS */}
       <section className="destinations-section">
-        <div className="section-title">
-          <p>CURATED EXPERIENCES</p>
-          <h2>Trending Destinations</h2>
-          <span>Discover the world’s most sought-after paradises and cultural capitals</span>
-        </div>
+        <div className="destinations-feature-box">
+          <div className="section-title destinations-heading">
+            <p>CURATED EXPERIENCES</p>
+            <h2>Top Destinations in India</h2>
+            <span>Discover the world’s most sought-after paradises and cultural capitals</span>
+          </div>
 
-        <div className="destinations-grid">
+          <div className="destinations-grid">
           {DESTINATIONS.slice(0, 6).map((dest) => (
             <div key={dest.id} className="destination-card">
               <div 
@@ -258,16 +259,17 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo 
               </div>
             </div>
           ))}
-        </div>
+          </div>
 
-        <div style={{ textAlign: 'center', marginTop: '40px' }}>
-          <button 
-            className="secondary-button" 
-            style={{ padding: '12px 28px', fontSize: '15px' }}
-            onClick={() => navigateTo('destinations')}
-          >
-            Explore All Indian Destinations <ArrowRight size={16} style={{ marginLeft: '8px' }} />
-          </button>
+          <div style={{ textAlign: 'center', marginTop: '40px' }}>
+            <button 
+              className="secondary-button" 
+              style={{ padding: '12px 28px', fontSize: '15px' }}
+              onClick={() => navigateTo('destinations')}
+            >
+              Explore All Indian Destinations <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+            </button>
+          </div>
         </div>
       </section>
 
