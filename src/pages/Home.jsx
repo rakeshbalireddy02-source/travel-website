@@ -6,7 +6,7 @@ import {
 import { DESTINATIONS, PACKAGES, TESTIMONIALS } from '../data/travelData';
 import AnimatedCounter from '../components/AnimatedCounter';
 
-export default function Home({ onSelectDestination, onSelectPackage, navigateTo, siteContent }) {
+export default function Home({ onSelectDestination, onSelectPackage, navigateTo, siteContent, packages = PACKAGES }) {
   const [searchLocation, setSearchLocation] = useState('');
   const [searchDate, setSearchDate] = useState('');
   const [searchGuests, setSearchGuests] = useState('2');
@@ -42,9 +42,11 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo,
 
   const handleClaimOffer = () => {
     handleClosePopup();
-    // Select the featured Kashmir package
-    const kashmirPkg = PACKAGES.find(p => p.destination.includes('Kashmir')) || PACKAGES[0];
-    onSelectPackage(kashmirPkg);
+    // Select the featured Kashmir package or first package
+    const kashmirPkg = packages.find(p => (p.destination || '').includes('Kashmir')) || packages[0];
+    if (kashmirPkg) {
+      onSelectPackage(kashmirPkg);
+    }
   };
 
   const handleSearchSubmit = (e) => {
@@ -282,7 +284,7 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo,
         </div>
 
         <div className="packages-grid">
-          {PACKAGES.slice(0, 3).map((pkg) => (
+          {packages.slice(0, 3).map((pkg) => (
             <div key={pkg.id} className="package-card">
               <div 
                 className="package-image-wrap" 

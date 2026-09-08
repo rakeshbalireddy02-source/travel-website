@@ -2,7 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { DESTINATIONS, PACKAGES } from '../data/travelData';
 import { CheckCircle2, Calendar, Users, MapPin, ShieldCheck, CreditCard } from 'lucide-react';
 
-export default function Booking({ initialItem, currentUser, onAddBooking, navigateTo }) {
+export default function Booking({ 
+  initialItem, 
+  currentUser, 
+  onAddBooking, 
+  navigateTo, 
+  packages = PACKAGES, 
+  destinations = DESTINATIONS 
+}) {
   const [selectedDestId, setSelectedDestId] = useState('');
   const [selectedPkgId, setSelectedPkgId] = useState('');
   const [fullName, setFullName] = useState(currentUser?.name || 'Rakesh Reddy');
@@ -28,14 +35,18 @@ export default function Booking({ initialItem, currentUser, onAddBooking, naviga
         setSelectedPkgId('');
       }
     } else {
-      // Default to first destination
-      setSelectedDestId(DESTINATIONS[0].id);
+      // Default to first destination or package
+      if (destinations[0]) {
+        setSelectedDestId(destinations[0].id);
+      } else if (packages[0]) {
+        setSelectedPkgId(packages[0].id);
+      }
     }
-  }, [initialItem]);
+  }, [initialItem, destinations, packages]);
 
   // Determine current active selection
-  const currentPkg = PACKAGES.find(p => p.id === selectedPkgId);
-  const currentDest = DESTINATIONS.find(d => d.id === selectedDestId);
+  const currentPkg = packages.find(p => p.id === selectedPkgId);
+  const currentDest = destinations.find(d => d.id === selectedDestId);
 
   const basePricePerPerson = currentPkg ? currentPkg.price : (currentDest ? currentDest.price : 14999);
   const itemName = currentPkg ? currentPkg.title : (currentDest ? currentDest.name : 'Goa');
@@ -112,13 +123,13 @@ export default function Booking({ initialItem, currentUser, onAddBooking, naviga
                   }}
                 >
                   <optgroup label="Featured Tour Packages">
-                    {PACKAGES.map(p => (
-                      <option key={p.id} value={`pkg:${p.id}`}>{p.title} (₹{p.price.toLocaleString('en-IN')}/p)</option>
+                    {packages.map(p => (
+                      <option key={p.id} value={`pkg:${p.id}`}>{p.title} (₹{Number(p.price).toLocaleString('en-IN')}/p)</option>
                     ))}
                   </optgroup>
                   <optgroup label="Individual Destinations">
-                    {DESTINATIONS.map(d => (
-                      <option key={d.id} value={`dest:${d.id}`}>{d.name} (₹{d.price.toLocaleString('en-IN')}/p)</option>
+                    {destinations.map(d => (
+                      <option key={d.id} value={`dest:${d.id}`}>{d.name} (₹{Number(d.price).toLocaleString('en-IN')}/p)</option>
                     ))}
                   </optgroup>
                 </select>

@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { Star, Check, Calendar, Users, Shield, Clock } from 'lucide-react';
 import { PACKAGES } from '../data/travelData';
 
-export default function Packages({ onSelectPackage }) {
+export default function Packages({ onSelectPackage, packages = PACKAGES }) {
   const [filterDuration, setFilterDuration] = useState('All');
 
-  const filteredPackages = PACKAGES.filter((pkg) => {
+  const filteredPackages = packages.filter((pkg) => {
     if (filterDuration === 'All') return true;
-    if (filterDuration === 'short') return pkg.duration.includes('5 Days') || pkg.duration.includes('6 Days');
-    if (filterDuration === 'long') return pkg.duration.includes('7 Days') || pkg.duration.includes('8 Days') || pkg.duration.includes('10 Days');
+    const dur = pkg.duration || '';
+    if (filterDuration === 'short') return dur.includes('4 Days') || dur.includes('5 Days') || dur.includes('6 Days');
+    if (filterDuration === 'long') return dur.includes('7 Days') || dur.includes('8 Days') || dur.includes('10 Days');
     return true;
   });
 
@@ -30,7 +31,7 @@ export default function Packages({ onSelectPackage }) {
               className={`chip-btn ${filterDuration === 'All' ? 'active' : ''}`}
               onClick={() => setFilterDuration('All')}
             >
-              All Packages ({PACKAGES.length})
+              All Packages ({packages.length})
             </button>
             <button 
               className={`chip-btn ${filterDuration === 'short' ? 'active' : ''}`}

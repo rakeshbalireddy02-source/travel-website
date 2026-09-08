@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -12,7 +12,7 @@ import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
-import { INITIAL_BOOKINGS } from './data/travelData';
+import { DESTINATIONS, PACKAGES, INITIAL_BOOKINGS } from './data/travelData';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 const THEMES = {
@@ -116,6 +116,51 @@ function App() {
     }
   });
 
+  const [removedDestinationIds, setRemovedDestinationIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem('travelgo_removed_destinations');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [destinationOverrides, setDestinationOverrides] = useState(() => {
+    try {
+      const saved = localStorage.getItem('travelgo_destination_overrides');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const [customPackages, setCustomPackages] = useState(() => {
+    try {
+      const saved = localStorage.getItem('travelgo_custom_packages');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [removedPackageIds, setRemovedPackageIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem('travelgo_removed_packages');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [packageOverrides, setPackageOverrides] = useState(() => {
+    try {
+      const saved = localStorage.getItem('travelgo_package_overrides');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
   // Current user state
   const [currentUser, setCurrentUser] = useState(() => {
     try {
@@ -123,13 +168,13 @@ function App() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed?.name === 'Alex Johnson' || parsed?.name === 'Rahul Sharma') {
-          return { name: 'Rakesh Reddy', email: 'rakesh.reddy@example.com' };
+          return { name: 'Rakesh Reddy', email: 'rakesh.reddy@example.com', isAdmin: true };
         }
-        return parsed;
+        return { ...parsed, isAdmin: parsed.isAdmin ?? (parsed.email === 'admin@travelgo.in' || parsed.name === 'Rakesh Reddy') };
       }
-      return { name: 'Rakesh Reddy', email: 'rakesh.reddy@example.com' };
+      return { name: 'Rakesh Reddy', email: 'rakesh.reddy@example.com', isAdmin: true };
     } catch {
-      return { name: 'Rakesh Reddy', email: 'rakesh.reddy@example.com' };
+      return { name: 'Rakesh Reddy', email: 'rakesh.reddy@example.com', isAdmin: true };
     }
   });
 
@@ -159,6 +204,30 @@ function App() {
       console.error(e);
     }
   }, [customDestinations]);
+
+  useEffect(() => {
+    localStorage.setItem('travelgo_removed_destinations', JSON.stringify(removedDestinationIds));
+  }, [removedDestinationIds]);
+
+  useEffect(() => {
+    localStorage.setItem('travelgo_destination_overrides', JSON.stringify(destinationOverrides));
+  }, [destinationOverrides]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('travelgo_custom_packages', JSON.stringify(customPackages));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [customPackages]);
+
+  useEffect(() => {
+    localStorage.setItem('travelgo_removed_packages', JSON.stringify(removedPackageIds));
+  }, [removedPackageIds]);
+
+  useEffect(() => {
+    localStorage.setItem('travelgo_package_overrides', JSON.stringify(packageOverrides));
+  }, [packageOverrides]);
 
   useEffect(() => {
     try {
@@ -230,7 +299,101 @@ function App() {
     setCustomDestinations(prev => prev.filter(dest => dest.id !== destinationId));
   };
 
+  const handleDeleteDestination = (destinationId) => {
+    if (DESTINATIONS.some(destination => destination.id === destinationId)) {
+      setRemovedDestinationIds(prev => prev.includes(destinationId) ? prev : [...prev, destinationId]);
+      return;
+    }
+
+    handleDeleteCustomDestination(destinationId);
+  };
+
+  const handleUpdateDestination = (destinationId, updatedDestination) => {
+    if (DESTINATIONS.some(destination => destination.id === destinationId)) {
+      setDestinationOverrides(prev => ({
+        ...prev,
+        [destinationId]: { ...prev[destinationId], ...updatedDestination }
+      }));
+      return;
+    }
+
+    handleUpdateCustomDestination(destinationId, updatedDestination);
+  };
+
+  const handleRestoreDestination = (destinationId) => {
+    setRemovedDestinationIds(prev => prev.filter(id => id !== destinationId));
+    showToast('Destination restored to public page!', 'success');
+  };
+
+  const managedDestinations = DESTINATIONS.map(destination => ({
+    ...destination,
+    ...destinationOverrides[destination.id]
+  }));
+
+  const handleAddCustomPackage = (pkg) => {
+    setCustomPackages(prev => [pkg, ...prev]);
+    showToast(`Package "${pkg.title}" added successfully!`, 'success');
+  };
+
+  const handleUpdateCustomPackage = (packageId, updatedPackage) => {
+    setCustomPackages(prev => prev.map(pkg => pkg.id === packageId ? { ...pkg, ...updatedPackage } : pkg));
+    showToast('Package updated successfully!', 'success');
+  };
+
+  const handleDeleteCustomPackage = (packageId) => {
+    setCustomPackages(prev => prev.filter(pkg => pkg.id !== packageId));
+    showToast('Package removed successfully!', 'info');
+  };
+
+  const handleDeletePackage = (packageId) => {
+    if (PACKAGES.some(pkg => pkg.id === packageId)) {
+      setRemovedPackageIds(prev => prev.includes(packageId) ? prev : [...prev, packageId]);
+      showToast('Package removed from public page.', 'info');
+      return;
+    }
+    handleDeleteCustomPackage(packageId);
+  };
+
+  const handleRestorePackage = (packageId) => {
+    setRemovedPackageIds(prev => prev.filter(id => id !== packageId));
+    showToast('Package restored to public page!', 'success');
+  };
+
+  const handleUpdatePackage = (packageId, updatedPackage) => {
+    if (PACKAGES.some(pkg => pkg.id === packageId)) {
+      setPackageOverrides(prev => ({
+        ...prev,
+        [packageId]: { ...prev[packageId], ...updatedPackage }
+      }));
+      showToast('Package updated successfully!', 'success');
+      return;
+    }
+    handleUpdateCustomPackage(packageId, updatedPackage);
+  };
+
+  const managedPackages = PACKAGES.map(pkg => ({
+    ...pkg,
+    ...packageOverrides[pkg.id]
+  }));
+
+  const allAdminPackages = [...managedPackages, ...customPackages];
+
+  const visiblePackages = [
+    ...managedPackages.filter(pkg => !removedPackageIds.includes(pkg.id)),
+    ...customPackages
+  ];
+
+  const visibleDestinations = [
+    ...managedDestinations.filter(destination => !removedDestinationIds.includes(destination.id)),
+    ...customDestinations
+  ];
+
   const handleLogin = (user) => {
+    try {
+      sessionStorage.removeItem('travelgo_popup_seen');
+    } catch (error) {
+      console.error(error);
+    }
     setCurrentUser(user);
     showToast(`Welcome back, ${user.name}!`, 'success');
   };
@@ -279,19 +442,21 @@ function App() {
             onSelectPackage={handleSelectPackage}
             navigateTo={handleNavigate}
             siteContent={siteContent}
+            packages={visiblePackages}
           />
         )}
 
         {currentPage === 'destinations' && (
           <Destinations 
             onSelectDestination={handleSelectDestination}
-            customDestinations={customDestinations}
+            customDestinations={visibleDestinations}
           />
         )}
 
         {currentPage === 'packages' && (
           <Packages 
             onSelectPackage={handleSelectPackage}
+            packages={visiblePackages}
           />
         )}
 
@@ -301,6 +466,8 @@ function App() {
             currentUser={currentUser}
             onAddBooking={handleAddBooking}
             navigateTo={handleNavigate}
+            packages={visiblePackages}
+            destinations={visibleDestinations}
           />
         )}
 
@@ -336,6 +503,17 @@ function App() {
             onAddBlogPost={handleAddCustomDestination}
             onUpdateBlogPost={handleUpdateCustomDestination}
             onDeleteBlogPost={handleDeleteCustomDestination}
+            destinations={[...managedDestinations, ...customDestinations]}
+            removedDestinationIds={removedDestinationIds}
+            onDeleteDestination={handleDeleteDestination}
+            onUpdateDestination={handleUpdateDestination}
+            onRestoreDestination={handleRestoreDestination}
+            packages={allAdminPackages}
+            removedPackageIds={removedPackageIds}
+            onAddPackage={handleAddCustomPackage}
+            onUpdatePackage={handleUpdatePackage}
+            onDeletePackage={handleDeletePackage}
+            onRestorePackage={handleRestorePackage}
             themes={THEMES}
             currentTheme={selectedTheme}
             onChangeTheme={setSelectedTheme}

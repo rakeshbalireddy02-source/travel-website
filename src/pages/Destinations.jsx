@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Star, MapPin, Search, Check, ArrowRight } from 'lucide-react';
 import { DESTINATIONS } from '../data/travelData';
 
-export default function Destinations({ onSelectDestination, customDestinations = [] }) {
+export default function Destinations({ onSelectDestination, customDestinations = null }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('featured');
 
   const categories = ['All', 'Beaches', 'Romantic', 'Mountains', 'Historic', 'Luxury', 'Adventure'];
-  const allDestinations = [...DESTINATIONS, ...customDestinations];
+  const allDestinations = customDestinations ?? DESTINATIONS;
 
   const filteredDestinations = allDestinations.filter((dest) => {
     const matchesCategory = selectedCategory === 'All' || dest.category === selectedCategory;
