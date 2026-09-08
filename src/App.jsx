@@ -63,7 +63,13 @@ const THEMES = {
 };
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
+  const [currentPage, setCurrentPage] = useState(() => {
+    try {
+      return sessionStorage.getItem('travelgo_current_page') || 'admin';
+    } catch {
+      return 'admin';
+    }
+  });
   const [selectedItemForBooking, setSelectedItemForBooking] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState('ocean');
   
@@ -188,6 +194,14 @@ function App() {
       console.error(e);
     }
   }, [bookings]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('travelgo_current_page', currentPage);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [currentPage]);
 
   useEffect(() => {
     localStorage.setItem('travelgo_messages', JSON.stringify(messages));
