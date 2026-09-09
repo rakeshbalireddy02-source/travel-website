@@ -12,7 +12,7 @@ import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
-import { DESTINATIONS, PACKAGES, INITIAL_BOOKINGS } from './data/travelData';
+import { DESTINATIONS, PACKAGES, TESTIMONIALS, FAQS, INITIAL_BOOKINGS } from './data/travelData';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 const THEMES = {
@@ -65,9 +65,10 @@ const THEMES = {
 function App() {
   const [currentPage, setCurrentPage] = useState(() => {
     try {
-      return sessionStorage.getItem('travelgo_current_page') || 'admin';
+      const savedPage = sessionStorage.getItem('travelgo_current_page');
+      return savedPage || 'login';
     } catch {
-      return 'admin';
+      return 'login';
     }
   });
   const [selectedItemForBooking, setSelectedItemForBooking] = useState(null);
@@ -92,17 +93,46 @@ function App() {
     }
   });
 
+  const [testimonials, setTestimonials] = useState(() => {
+    try {
+      const saved = localStorage.getItem('travelgo_testimonials');
+      return saved ? JSON.parse(saved) : TESTIMONIALS;
+    } catch {
+      return TESTIMONIALS;
+    }
+  });
+
+  const [faqs, setFaqs] = useState(() => {
+    try {
+      const saved = localStorage.getItem('travelgo_faqs');
+      return saved ? JSON.parse(saved) : FAQS;
+    } catch {
+      return FAQS;
+    }
+  });
+
   const [siteContent, setSiteContent] = useState(() => {
     const defaultContent = {
       heroEyebrow: 'DISCOVER INCREDIBLE INDIA',
       heroTitle: "Explore India's Majestic Wonders & Heritage",
       heroDescription: 'Curated royal palace retreats, serene backwater cruises, snow-capped Himalayan escapes, and tropical beach getaways across India.',
+      heroImage: '/travel-bg.jpg',
       aboutEyebrow: 'OUR STORY & PASSION',
       aboutTitle: 'About TravelGo',
       aboutSubtitle: 'Connecting curious wanderers with extraordinary, soul-stirring journeys worldwide',
+      aboutImage: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80',
+      aboutStoryTitle: 'Crafting Unforgettable Travel Memories Since 2014',
+      aboutStoryOne: "TravelGo was born from a simple belief: that travel isn't just about visiting new places, but about the profound moments that expand our perspectives and enrich our lives.",
+      aboutStoryTwo: 'Over the past decade, we have grown into a premier global travel collective, having curated extraordinary journeys for over 28,000 discerning travelers across 150+ breathtaking destinations.',
+      aboutStoryThree: 'From private overwater bungalows in the Maldives and secluded chalets in the Swiss Alps to authentic cultural immersions in Kyoto, our expert concierges design each itinerary with meticulous craftsmanship.',
       contactEyebrow: "WE'RE HERE TO ASSIST YOU",
-      contactTitle: 'Get In Touch',
-      contactSubtitle: 'Have inquiries about an itinerary or need custom vacation planning? Our specialists are available 24/7'
+      contactTitle: 'Contact Us',
+      contactSubtitle: 'Have inquiries about an itinerary or need custom vacation planning? Our specialists are available 24/7',
+      popupImage: '/travel-promo-popup.jpg',
+      popupBadge: '✨ Limited Time Offer',
+      popupTitle: 'Special Festive Offer: Flat ₹2,500 OFF!',
+      popupDescription: 'Book your dream houseboat cruise in Kerala, Kashmir snow retreat, or Royal Rajasthan palace tour today. Use coupon code at checkout:',
+      popupCode: 'TRAVELGO2500'
     };
 
     try {
@@ -206,6 +236,14 @@ function App() {
   useEffect(() => {
     localStorage.setItem('travelgo_messages', JSON.stringify(messages));
   }, [messages]);
+
+  useEffect(() => {
+    localStorage.setItem('travelgo_testimonials', JSON.stringify(testimonials));
+  }, [testimonials]);
+
+  useEffect(() => {
+    localStorage.setItem('travelgo_faqs', JSON.stringify(faqs));
+  }, [faqs]);
 
   useEffect(() => {
     localStorage.setItem('travelgo_site_content', JSON.stringify(siteContent));
@@ -457,6 +495,7 @@ function App() {
             navigateTo={handleNavigate}
             siteContent={siteContent}
             packages={visiblePackages}
+            testimonials={testimonials}
           />
         )}
 
@@ -501,13 +540,37 @@ function App() {
         )}
 
         {currentPage === 'contact' && (
-          <Contact onAddMessage={handleAddMessage} siteContent={siteContent} />
+          <Contact onAddMessage={handleAddMessage} siteContent={siteContent} faqs={faqs} />
         )}
 
         {currentPage === 'admin' && currentUser?.isAdmin && (
           <Admin
             bookings={bookings}
             messages={messages}
+            testimonials={testimonials}
+            faqs={faqs}
+            onAddTestimonial={(testimonial) => {
+              setTestimonials(prev => [testimonial, ...prev]);
+            }}
+            onUpdateTestimonial={(testimonialId, updatedTestimonial) => {
+              setTestimonials(prev => prev.map(testimonial => (
+                testimonial.id === testimonialId
+                  ? { ...testimonial, ...updatedTestimonial }
+                  : testimonial
+              )));
+            }}
+            onDeleteTestimonial={(testimonialId) => {
+              setTestimonials(prev => prev.filter(testimonial => testimonial.id !== testimonialId));
+            }}
+            onAddFaq={(faq) => {
+              setFaqs(prev => [faq, ...prev]);
+            }}
+            onUpdateFaq={(faqId, updatedFaq) => {
+              setFaqs(prev => prev.map(faq => faq.id === faqId ? { ...faq, ...updatedFaq } : faq));
+            }}
+            onDeleteFaq={(faqId) => {
+              setFaqs(prev => prev.filter(faq => faq.id !== faqId));
+            }}
             onUpdateBooking={handleUpdateBooking}
             onDeleteMessage={handleDeleteMessage}
             onLogout={handleLogout}

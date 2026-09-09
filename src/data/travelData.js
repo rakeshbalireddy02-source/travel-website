@@ -332,18 +332,22 @@ export const TESTIMONIALS = [
 
 export const FAQS = [
   {
+    id: "faq-1",
     q: "How does the booking and payment process work for Indian tours?",
     a: "Select your desired destination or tour package, choose your dates and number of travelers, fill out traveler details, and submit. You will receive an instant confirmation ID and downloadable receipt in My Bookings."
   },
   {
+    id: "faq-2",
     q: "Are hotel stays, private transfers, and sightseeing permits included?",
     a: "Yes! All our curated packages include handpicked 4★/5★ hotels or heritage houseboats, private AC vehicles with verified chauffeurs, entry passes (such as Gulmarg Gondola or Ladakh Inner Line permits), and daily meals as per itinerary."
   },
   {
+    id: "faq-3",
     q: "Can I customize the itinerary or add extra days?",
     a: "Absolutely! You can add special requests during booking or get in touch with our 24/7 concierge on the Contact page, and we will tailor your dream vacation itinerary."
   },
   {
+    id: "faq-4",
     q: "What is the cancellation and refund policy?",
     a: "We offer 100% flexible booking with zero cancellation charges up to 14 days before your scheduled departure date. Refunds are processed immediately to your original payment method."
   }

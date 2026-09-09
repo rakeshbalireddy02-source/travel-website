@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import {
-  BarChart3, Home, LayoutGrid, LogOut, MessageSquareText,
+  BarChart3, Home, LayoutGrid, LogOut, MessageSquareText, HelpCircle,
   Search, X, Luggage, Edit, Trash2, RotateCcw, MapPin, Check
 } from 'lucide-react';
 
@@ -25,7 +25,15 @@ export default function Admin({
   onRestorePackage,
   bookings = [],
   messages = [],
-  onDeleteMessage
+  onDeleteMessage,
+  testimonials = [],
+  onAddTestimonial,
+  onUpdateTestimonial,
+  onDeleteTestimonial,
+  faqs = [],
+  onAddFaq,
+  onUpdateFaq,
+  onDeleteFaq
 }) {
   const [activeSection, setActiveSection] = useState('Destinations');
 
@@ -72,7 +80,8 @@ export default function Admin({
   const [heroDraft, setHeroDraft] = useState({
     heroEyebrow: siteContent?.heroEyebrow || 'DISCOVER INCREDIBLE INDIA',
     heroTitle: siteContent?.heroTitle || "Explore India's Majestic Wonders & Heritage",
-    heroDescription: siteContent?.heroDescription || 'Curated royal palace retreats, serene backwater cruises, snow-capped Himalayan escapes, and tropical beach getaways across India.'
+    heroDescription: siteContent?.heroDescription || 'Curated royal palace retreats, serene backwater cruises, snow-capped Himalayan escapes, and tropical beach getaways across India.',
+    heroImage: siteContent?.heroImage || '/travel-bg.jpg'
   });
   const [heroFeedback, setHeroFeedback] = useState(false);
 
@@ -83,6 +92,31 @@ export default function Admin({
     contactSubtitle: siteContent?.contactSubtitle || 'Have inquiries about an itinerary or need custom vacation planning? Our specialists are available 24/7'
   });
   const [contactFeedback, setContactFeedback] = useState(false);
+  const [aboutDraft, setAboutDraft] = useState({
+    aboutEyebrow: siteContent?.aboutEyebrow || 'OUR STORY & PASSION',
+    aboutTitle: siteContent?.aboutTitle || 'About TravelGo',
+    aboutSubtitle: siteContent?.aboutSubtitle || 'Connecting curious wanderers with extraordinary, soul-stirring journeys worldwide',
+    aboutImage: siteContent?.aboutImage || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80',
+    aboutStoryTitle: siteContent?.aboutStoryTitle || 'Crafting Unforgettable Travel Memories Since 2014',
+    aboutStoryOne: siteContent?.aboutStoryOne || '',
+    aboutStoryTwo: siteContent?.aboutStoryTwo || '',
+    aboutStoryThree: siteContent?.aboutStoryThree || ''
+  });
+  const [aboutFeedback, setAboutFeedback] = useState(false);
+  const [popupDraft, setPopupDraft] = useState({
+    popupImage: siteContent?.popupImage || '/travel-promo-popup.jpg',
+    popupBadge: siteContent?.popupBadge || '✨ Limited Time Offer',
+    popupTitle: siteContent?.popupTitle || 'Special Festive Offer: Flat ₹2,500 OFF!',
+    popupDescription: siteContent?.popupDescription || '',
+    popupCode: siteContent?.popupCode || 'TRAVELGO2500'
+  });
+  const [popupFeedback, setPopupFeedback] = useState(false);
+  const [editingTestimonialId, setEditingTestimonialId] = useState(null);
+  const [testimonialDraft, setTestimonialDraft] = useState({});
+  const [showTestimonialForm, setShowTestimonialForm] = useState(false);
+  const [editingFaqId, setEditingFaqId] = useState(null);
+  const [faqDraft, setFaqDraft] = useState({});
+  const [showFaqForm, setShowFaqForm] = useState(false);
 
   const activeDestinationsCount = Math.max(0, destinations.length - removedDestinationIds.length);
   const activePackagesCount = Math.max(0, packages.length - removedPackageIds.length);
@@ -93,11 +127,15 @@ export default function Admin({
     { label: 'Destinations', icon: MapPin, count: activeDestinationsCount },
     { label: 'Packages', icon: Luggage, count: activePackagesCount },
     { label: 'Home Hero', icon: Home },
+    { label: 'About Us', icon: Home },
     { label: 'Contact Section', icon: MessageSquareText },
+    { label: 'Promo Popup', icon: MessageSquareText },
     { label: 'Comments', icon: MessageSquareText, count: messages.length },
+    { label: 'Guest Reviews', icon: MessageSquareText, count: testimonials.length },
+    { label: 'FAQs', icon: HelpCircle, count: faqs.length },
     { label: 'Configuration', icon: LayoutGrid },
     { label: 'Logout', icon: LogOut }
-  ], [activeDestinationsCount, activePackagesCount, messages.length]);
+  ], [activeDestinationsCount, activePackagesCount, messages.length, testimonials.length, faqs.length]);
 
   const dashboardStats = useMemo(() => [
     { label: 'Destinations', value: activeDestinationsCount, section: 'Destinations' },
@@ -288,7 +326,8 @@ export default function Admin({
       ...current,
       heroEyebrow: heroDraft.heroEyebrow,
       heroTitle: heroDraft.heroTitle,
-      heroDescription: heroDraft.heroDescription
+      heroDescription: heroDraft.heroDescription,
+      heroImage: heroDraft.heroImage
     }));
     setHeroFeedback(true);
     setTimeout(() => setHeroFeedback(false), 3000);
@@ -307,6 +346,20 @@ export default function Admin({
     setTimeout(() => setContactFeedback(false), 3000);
   };
 
+  const handleSaveAbout = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    onUpdateContent?.(current => ({ ...current, ...aboutDraft }));
+    setAboutFeedback(true);
+    setTimeout(() => setAboutFeedback(false), 3000);
+  };
+
+  const handleSavePopup = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    onUpdateContent?.(current => ({ ...current, ...popupDraft }));
+    setPopupFeedback(true);
+    setTimeout(() => setPopupFeedback(false), 3000);
+  };
+
   const handleSidebarClick = (label) => {
     if (label === 'Logout') {
       onLogout?.();
@@ -315,39 +368,56 @@ export default function Admin({
     setActiveSection(label);
   };
 
+  const startTestimonialEdit = (testimonial) => {
+    setEditingTestimonialId(testimonial.id);
+    setTestimonialDraft({ ...testimonial });
+  };
+
+  const saveTestimonial = () => {
+    onUpdateTestimonial?.(editingTestimonialId, testimonialDraft);
+    setEditingTestimonialId(null);
+  };
+
+  const addTestimonial = () => {
+    if (!testimonialDraft.name?.trim() || !testimonialDraft.comment?.trim()) return;
+    onAddTestimonial?.({
+      id: `testimonial-${Date.now()}`,
+      name: testimonialDraft.name.trim(),
+      role: testimonialDraft.role?.trim() || 'TravelGo Guest',
+      location: testimonialDraft.location?.trim() || '',
+      comment: testimonialDraft.comment.trim(),
+      rating: Number(testimonialDraft.rating) || 5,
+      avatar: testimonialDraft.avatar?.trim() || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80'
+    });
+    setTestimonialDraft({});
+    setShowTestimonialForm(false);
+  };
+
+  const startFaqEdit = (faq) => {
+    setEditingFaqId(faq.id);
+    setFaqDraft({ ...faq });
+  };
+
+  const saveFaq = () => {
+    if (!faqDraft.q?.trim() || !faqDraft.a?.trim()) return;
+    onUpdateFaq?.(editingFaqId, { q: faqDraft.q.trim(), a: faqDraft.a.trim() });
+    setEditingFaqId(null);
+    setFaqDraft({});
+  };
+
+  const addFaq = () => {
+    if (!faqDraft.q?.trim() || !faqDraft.a?.trim()) return;
+    onAddFaq?.({
+      id: `faq-${Date.now()}`,
+      q: faqDraft.q.trim(),
+      a: faqDraft.a.trim()
+    });
+    setFaqDraft({});
+    setShowFaqForm(false);
+  };
+
   // Quick switch navigation buttons rendered at top
-  const renderQuickNav = () => (
-    <div className="admin-quick-nav" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '1.25rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
-      <button 
-        type="button" 
-        className={`admin-cms-action-btn ${activeSection === 'Destinations' ? 'primary' : ''}`}
-        onClick={() => setActiveSection('Destinations')}
-      >
-        <MapPin size={14} /> Destinations ({activeDestinationsCount})
-      </button>
-      <button 
-        type="button" 
-        className={`admin-cms-action-btn ${activeSection === 'Packages' ? 'primary' : ''}`}
-        onClick={() => setActiveSection('Packages')}
-      >
-        <Luggage size={14} /> Packages ({activePackagesCount})
-      </button>
-      <button 
-        type="button" 
-        className={`admin-cms-action-btn ${activeSection === 'Home Hero' ? 'primary' : ''}`}
-        onClick={() => setActiveSection('Home Hero')}
-      >
-        <Home size={14} /> Home Hero Section
-      </button>
-      <button 
-        type="button" 
-        className={`admin-cms-action-btn ${activeSection === 'Contact Section' ? 'primary' : ''}`}
-        onClick={() => setActiveSection('Contact Section')}
-      >
-        <MessageSquareText size={14} /> Contact Section
-      </button>
-    </div>
-  );
+  const renderQuickNav = () => null;
 
   const renderSection = () => {
     if (activeSection === 'Dashboard') {
@@ -429,6 +499,252 @@ export default function Admin({
       );
     }
 
+    if (activeSection === 'Guest Reviews') {
+      return (
+        <div className="admin-cms-dashboard">
+          {renderQuickNav()}
+          <div className="admin-cms-toolbar" style={{ marginBottom: '1.25rem' }}>
+            <div>
+              <h3 style={{ margin: '0 0 4px', fontSize: '24px' }}>What Our Guests Say</h3>
+              <span style={{ color: '#64748b', fontSize: '13px' }}>Edit or remove testimonials displayed on the public homepage.</span>
+            </div>
+            <button type="button" className="admin-cms-action-btn primary" onClick={() => { setShowTestimonialForm(true); setTestimonialDraft({ rating: 5 }); }}>
+              + Add Guest Review
+            </button>
+          </div>
+          {showTestimonialForm && (
+            <div className="admin-testimonial-editor admin-testimonial-add-form">
+              <input value={testimonialDraft.name || ''} onChange={event => setTestimonialDraft({ ...testimonialDraft, name: event.target.value })} placeholder="Guest name *" />
+              <input value={testimonialDraft.role || ''} onChange={event => setTestimonialDraft({ ...testimonialDraft, role: event.target.value })} placeholder="Role" />
+              <input value={testimonialDraft.location || ''} onChange={event => setTestimonialDraft({ ...testimonialDraft, location: event.target.value })} placeholder="Location" />
+              <input type="number" min="1" max="5" value={testimonialDraft.rating || 5} onChange={event => setTestimonialDraft({ ...testimonialDraft, rating: event.target.value })} placeholder="Rating" />
+              <textarea value={testimonialDraft.comment || ''} onChange={event => setTestimonialDraft({ ...testimonialDraft, comment: event.target.value })} placeholder="Review *" />
+              <div className="admin-cms-blog-item-actions">
+                <button type="button" className="admin-cms-action-btn primary" onClick={addTestimonial}>Add Review</button>
+                <button type="button" className="admin-cms-action-btn" onClick={() => { setShowTestimonialForm(false); setTestimonialDraft({}); }}>Cancel</button>
+              </div>
+            </div>
+          )}
+          <div className="admin-cms-blog-list">
+            {testimonials.length === 0 ? (
+              <div className="admin-cms-banner">No guest reviews available.</div>
+            ) : testimonials.map(testimonial => (
+              <div className="admin-cms-blog-item" key={testimonial.id}>
+                {editingTestimonialId === testimonial.id ? (
+                  <div className="admin-testimonial-editor">
+                    <input value={testimonialDraft.name || ''} onChange={event => setTestimonialDraft({ ...testimonialDraft, name: event.target.value })} placeholder="Guest name" />
+                    <input value={testimonialDraft.role || ''} onChange={event => setTestimonialDraft({ ...testimonialDraft, role: event.target.value })} placeholder="Role" />
+                    <input value={testimonialDraft.location || ''} onChange={event => setTestimonialDraft({ ...testimonialDraft, location: event.target.value })} placeholder="Location" />
+                    <textarea value={testimonialDraft.comment || ''} onChange={event => setTestimonialDraft({ ...testimonialDraft, comment: event.target.value })} placeholder="Review" />
+                    <div className="admin-cms-blog-item-actions">
+                      <button type="button" className="admin-cms-action-btn primary" onClick={saveTestimonial}>Save</button>
+                      <button type="button" className="admin-cms-action-btn" onClick={() => setEditingTestimonialId(null)}>Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <strong>{testimonial.name}</strong>
+                    <span>{testimonial.role} {testimonial.location ? `- ${testimonial.location}` : ''}</span>
+                    <small>{testimonial.comment}</small>
+                    <div className="admin-review-stars">{'★'.repeat(Number(testimonial.rating) || 0)}</div>
+                  </div>
+                )}
+                {editingTestimonialId !== testimonial.id && (
+                  <div className="admin-cms-blog-item-actions">
+                    <button type="button" className="admin-cms-action-btn" onClick={() => startTestimonialEdit(testimonial)}>Edit</button>
+                    <button type="button" className="admin-cms-action-btn danger" onClick={() => onDeleteTestimonial?.(testimonial.id)}>Remove</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (activeSection === 'About Us') {
+      return (
+        <div className="admin-cms-dashboard">
+          {renderQuickNav()}
+          <div className="admin-cms-toolbar" style={{ marginBottom: '1.25rem' }}>
+            <div>
+              <h3 style={{ margin: '0 0 4px', fontSize: '24px' }}>About Us Section</h3>
+              <span style={{ color: '#64748b', fontSize: '13px' }}>Edit the About page heading and main company story.</span>
+            </div>
+          </div>
+          <div className="admin-content-editor-layout">
+            <div className="admin-cms-blog-panel admin-content-editor-panel" style={{ marginTop: 0 }}>
+              <div className="admin-content-editor-intro">
+                <span className="admin-content-editor-kicker">Public page content</span>
+                <h4>Shape your story</h4>
+                <p>Keep the introduction concise, warm, and aligned with the TravelGo experience.</p>
+              </div>
+              <form className="admin-content-editor-form" onSubmit={handleSaveAbout}>
+              {[
+                ['aboutEyebrow', 'Eyebrow Tag'],
+                ['aboutTitle', 'Page Title'],
+                ['aboutSubtitle', 'Page Subtitle'],
+                ['aboutImage', 'About Image URL'],
+                ['aboutStoryTitle', 'Story Title']
+              ].map(([field, label]) => (
+                <label key={field} style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', fontWeight: 700, color: '#334155' }}>
+                  <span>{label}</span>
+                  <input value={aboutDraft[field]} onChange={e => setAboutDraft(current => ({ ...current, [field]: e.target.value }))} />
+                </label>
+              ))}
+              {[
+                ['aboutStoryOne', 'Story Paragraph 1'],
+                ['aboutStoryTwo', 'Story Paragraph 2'],
+                ['aboutStoryThree', 'Story Paragraph 3']
+              ].map(([field, label]) => (
+                <label key={field} style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', fontWeight: 700, color: '#334155' }}>
+                  <span>{label}</span>
+                  <textarea rows={3} value={aboutDraft[field]} onChange={e => setAboutDraft(current => ({ ...current, [field]: e.target.value }))} />
+                </label>
+              ))}
+              <div className="admin-content-editor-actions">
+                <button type="submit" className="admin-cms-action-btn primary">
+                  {aboutFeedback ? <Check size={14} /> : null} {aboutFeedback ? 'Saved!' : 'Save About Section'}
+                </button>
+              </div>
+              </form>
+            </div>
+            <aside className="admin-content-preview">
+              <div className="admin-content-preview-label">Live preview</div>
+              <div className="admin-about-preview">
+                <div className="admin-about-preview-image" style={{ backgroundImage: `url(${aboutDraft.aboutImage || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80'})` }} />
+                <span>{aboutDraft.aboutEyebrow || 'OUR STORY & PASSION'}</span>
+                <h4>{aboutDraft.aboutTitle || 'About TravelGo'}</h4>
+                <p className="admin-about-preview-subtitle">{aboutDraft.aboutSubtitle || 'Connecting curious wanderers with extraordinary journeys worldwide'}</p>
+                <div className="admin-about-preview-story">
+                  <strong>{aboutDraft.aboutStoryTitle || 'Crafting Unforgettable Travel Memories Since 2014'}</strong>
+                  <p>{aboutDraft.aboutStoryOne || 'Your first story paragraph will appear here.'}</p>
+                  <p>{aboutDraft.aboutStoryTwo || 'Your second story paragraph will appear here.'}</p>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      );
+    }
+
+    if (activeSection === 'Promo Popup') {
+      return (
+        <div className="admin-cms-dashboard">
+          {renderQuickNav()}
+          <div className="admin-cms-toolbar" style={{ marginBottom: '1.25rem' }}>
+            <div>
+              <h3 style={{ margin: '0 0 4px', fontSize: '24px' }}>Promo Popup</h3>
+              <span style={{ color: '#64748b', fontSize: '13px' }}>Edit the promotional popup shown on the homepage.</span>
+            </div>
+          </div>
+          <div className="admin-content-editor-layout">
+            <div className="admin-cms-blog-panel admin-content-editor-panel" style={{ marginTop: 0 }}>
+              <div className="admin-content-editor-intro">
+                <span className="admin-content-editor-kicker">Homepage conversion tool</span>
+                <h4>Make the offer unmistakable</h4>
+                <p>Use a short promise, a clear code, and an image that supports the promotion.</p>
+              </div>
+              <form className="admin-content-editor-form" onSubmit={handleSavePopup}>
+              {[
+                ['popupImage', 'Popup Image URL'],
+                ['popupBadge', 'Offer Badge'],
+                ['popupTitle', 'Offer Title'],
+                ['popupCode', 'Coupon Code']
+              ].map(([field, label]) => (
+                <label key={field} style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', fontWeight: 700, color: '#334155' }}>
+                  <span>{label}</span>
+                  <input value={popupDraft[field]} onChange={e => setPopupDraft(current => ({ ...current, [field]: e.target.value }))} />
+                </label>
+              ))}
+              <label style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', fontWeight: 700, color: '#334155' }}>
+                <span>Offer Description</span>
+                <textarea rows={4} value={popupDraft.popupDescription} onChange={e => setPopupDraft(current => ({ ...current, popupDescription: e.target.value }))} />
+              </label>
+              <div className="admin-content-editor-actions">
+                <button type="submit" className="admin-cms-action-btn primary">
+                  {popupFeedback ? <Check size={14} /> : null} {popupFeedback ? 'Saved!' : 'Save Promo Popup'}
+                </button>
+              </div>
+              </form>
+            </div>
+            <aside className="admin-content-preview">
+              <div className="admin-content-preview-label">Live preview</div>
+              <div className="admin-popup-preview">
+                <div className="admin-popup-preview-image" style={{ backgroundImage: `url(${popupDraft.popupImage || '/travel-promo-popup.jpg'})` }}>
+                  <span>{popupDraft.popupBadge || '✨ Limited Time Offer'}</span>
+                </div>
+                <div className="admin-popup-preview-body">
+                  <h4>{popupDraft.popupTitle || 'Special Festive Offer'}</h4>
+                  <p>{popupDraft.popupDescription || 'Your offer description will appear here.'}</p>
+                  <div className="admin-popup-preview-code">{popupDraft.popupCode || 'TRAVELGO2500'}</div>
+                  <div className="admin-popup-preview-actions"><span>Maybe Later</span><strong>Claim &amp; Book Now</strong></div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      );
+    }
+
+    if (activeSection === 'FAQs') {
+      return (
+        <div className="admin-cms-dashboard">
+          {renderQuickNav()}
+          <div className="admin-cms-toolbar" style={{ marginBottom: '1.25rem' }}>
+            <div>
+              <h3 style={{ margin: '0 0 4px', fontSize: '24px' }}>Frequently Asked Questions</h3>
+              <span style={{ color: '#64748b', fontSize: '13px' }}>Edit or remove questions displayed on the public Contact page.</span>
+            </div>
+            <button type="button" className="admin-cms-action-btn primary" onClick={() => { setShowFaqForm(true); setFaqDraft({}); }}>
+              + Add FAQ
+            </button>
+          </div>
+
+          {showFaqForm && (
+            <div className="admin-testimonial-editor admin-testimonial-add-form">
+              <input value={faqDraft.q || ''} onChange={event => setFaqDraft({ ...faqDraft, q: event.target.value })} placeholder="Question *" />
+              <textarea value={faqDraft.a || ''} onChange={event => setFaqDraft({ ...faqDraft, a: event.target.value })} placeholder="Answer *" />
+              <div className="admin-cms-blog-item-actions">
+                <button type="button" className="admin-cms-action-btn primary" onClick={addFaq}>Add FAQ</button>
+                <button type="button" className="admin-cms-action-btn" onClick={() => { setShowFaqForm(false); setFaqDraft({}); }}>Cancel</button>
+              </div>
+            </div>
+          )}
+
+          <div className="admin-cms-blog-list">
+            {faqs.length === 0 ? (
+              <div className="admin-cms-banner">No FAQs available.</div>
+            ) : faqs.map(faq => (
+              <div className="admin-cms-blog-item" key={faq.id}>
+                {editingFaqId === faq.id ? (
+                  <div className="admin-testimonial-editor">
+                    <input value={faqDraft.q || ''} onChange={event => setFaqDraft({ ...faqDraft, q: event.target.value })} placeholder="Question" />
+                    <textarea value={faqDraft.a || ''} onChange={event => setFaqDraft({ ...faqDraft, a: event.target.value })} placeholder="Answer" />
+                    <div className="admin-cms-blog-item-actions">
+                      <button type="button" className="admin-cms-action-btn primary" onClick={saveFaq}>Save</button>
+                      <button type="button" className="admin-cms-action-btn" onClick={() => { setEditingFaqId(null); setFaqDraft({}); }}>Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <strong>{faq.q}</strong>
+                    <small>{faq.a}</small>
+                  </div>
+                )}
+                {editingFaqId !== faq.id && (
+                  <div className="admin-cms-blog-item-actions">
+                    <button type="button" className="admin-cms-action-btn" onClick={() => startFaqEdit(faq)}>Edit</button>
+                    <button type="button" className="admin-cms-action-btn danger" onClick={() => onDeleteFaq?.(faq.id)}>Remove</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     // HOME HERO SECTION EDITOR
     if (activeSection === 'Home Hero') {
       return (
@@ -483,6 +799,16 @@ export default function Admin({
                   />
                 </label>
 
+                <label style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', fontWeight: 700, color: '#334155' }}>
+                  <span>Hero Image URL</span>
+                  <input
+                    value={heroDraft.heroImage}
+                    onChange={e => setHeroDraft(c => ({ ...c, heroImage: e.target.value }))}
+                    placeholder="/travel-bg.jpg or https://example.com/hero.jpg"
+                    style={{ border: '1px solid #dfe7ef', borderRadius: '6px', padding: '10px', fontSize: '14px' }}
+                  />
+                </label>
+
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
                   <button
                     type="button"
@@ -490,7 +816,8 @@ export default function Admin({
                     onClick={() => setHeroDraft({
                       heroEyebrow: 'DISCOVER INCREDIBLE INDIA',
                       heroTitle: "Explore India's Majestic Wonders & Heritage",
-                      heroDescription: 'Curated royal palace retreats, serene backwater cruises, snow-capped Himalayan escapes, and tropical beach getaways across India.'
+                      heroDescription: 'Curated royal palace retreats, serene backwater cruises, snow-capped Himalayan escapes, and tropical beach getaways across India.',
+                      heroImage: '/travel-bg.jpg'
                     })}
                   >
                     Reset Defaults
@@ -507,7 +834,9 @@ export default function Admin({
             <div>
               <h4 style={{ margin: '0 0 10px', fontSize: '14px', color: '#64748b' }}>Live Homepage Preview</h4>
               <div style={{
-                background: 'linear-gradient(135deg, #0f766e 0%, #115e59 100%)',
+                backgroundImage: `linear-gradient(rgba(15, 118, 110, 0.78), rgba(17, 94, 89, 0.82)), url("${heroDraft.heroImage || '/travel-bg.jpg'}")`,
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
                 color: '#ffffff',
                 borderRadius: '14px',
                 padding: '28px 24px',

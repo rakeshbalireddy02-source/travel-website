@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
-import { FAQS } from '../data/travelData';
 import emailjs from '@emailjs/browser';
 
 const emailJsServiceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const emailJsPublicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-export default function Contact({ onAddMessage, siteContent }) {
+export default function Contact({ onAddMessage, siteContent, faqs = [] }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -69,7 +68,7 @@ export default function Contact({ onAddMessage, siteContent }) {
       <div className="page-header">
         <div>
           <p>{siteContent?.contactEyebrow || "WE'RE HERE TO ASSIST YOU"}</p>
-          <h1>{siteContent?.contactTitle || 'Get In Touch'}</h1>
+          <h1>{siteContent?.contactTitle || 'Contact Us'}</h1>
           <span>{siteContent?.contactSubtitle || 'Have inquiries about an itinerary or need custom vacation planning? Our specialists are available 24/7'}</span>
         </div>
       </div>
@@ -197,7 +196,7 @@ export default function Contact({ onAddMessage, siteContent }) {
         </div>
 
         <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {FAQS.map((faq, index) => {
+          {faqs.map((faq, index) => {
             const isOpen = openFaq === index;
             return (
               <div 

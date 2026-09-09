@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { DESTINATIONS, PACKAGES } from '../data/travelData';
 import { CheckCircle2, Calendar, Users, MapPin, ShieldCheck, CreditCard } from 'lucide-react';
 
-export default function Booking({ 
-  initialItem, 
-  currentUser, 
-  onAddBooking, 
-  navigateTo, 
-  packages = PACKAGES, 
-  destinations = DESTINATIONS 
+export default function Booking({
+  initialItem,
+  currentUser,
+  onAddBooking,
+  navigateTo,
+  packages = PACKAGES,
+  destinations = DESTINATIONS
 }) {
   const [selectedDestId, setSelectedDestId] = useState('');
   const [selectedPkgId, setSelectedPkgId] = useState('');
@@ -52,8 +52,8 @@ export default function Booking({
   const itemName = currentPkg ? currentPkg.title : (currentDest ? currentDest.name : 'Goa');
 
   const tierUpgrade = accommodationTier === 'luxury' ? 4500 : (accommodationTier === 'deluxe' ? 2000 : 0);
-  const tierLabel = accommodationTier === 'luxury' 
-    ? 'Luxury 5★ Palace / Houseboat (+ ₹4,500/p)' 
+  const tierLabel = accommodationTier === 'luxury'
+    ? 'Luxury 5★ Palace / Houseboat (+ ₹4,500/p)'
     : (accommodationTier === 'deluxe' ? 'Deluxe 4★ Resort (+ ₹2,000/p)' : 'Standard 3★ Heritage Stay (Included)');
 
   const subtotal = (basePricePerPerson + tierUpgrade) * travelers;
@@ -109,7 +109,7 @@ export default function Booking({
               {/* Trip Selection */}
               <div className="form-group">
                 <label>Select Tour Package or Destination</label>
-                <select 
+                <select
                   value={selectedPkgId ? `pkg:${selectedPkgId}` : `dest:${selectedDestId}`}
                   onChange={(e) => {
                     const [type, id] = e.target.value.split(':');
@@ -138,21 +138,21 @@ export default function Booking({
               {/* Personal Details */}
               <div className="form-group">
                 <label>Full Name *</label>
-                <input 
-                  type="text" 
-                  required 
+                <input
+                  type="text"
+                  required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Rahul Sharma"
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div className="booking-field-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <div className="form-group">
                   <label>Email Address *</label>
-                  <input 
-                    type="email" 
-                    required 
+                  <input
+                    type="email"
+                    required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="rahul.sharma@example.com"
@@ -160,9 +160,9 @@ export default function Booking({
                 </div>
                 <div className="form-group">
                   <label>Phone Number *</label>
-                  <input 
-                    type="tel" 
-                    required 
+                  <input
+                    type="tel"
+                    required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 98765 43210"
@@ -171,21 +171,21 @@ export default function Booking({
               </div>
 
               {/* Dates */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div className="booking-field-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <div className="form-group">
                   <label>Departure Date *</label>
-                  <input 
-                    type="date" 
-                    required 
+                  <input
+                    type="date"
+                    required
                     value={travelDate}
                     onChange={(e) => setTravelDate(e.target.value)}
                   />
                 </div>
                 <div className="form-group">
                   <label>Return Date *</label>
-                  <input 
-                    type="date" 
-                    required 
+                  <input
+                    type="date"
+                    required
                     value={returnDate}
                     onChange={(e) => setReturnDate(e.target.value)}
                   />
@@ -193,25 +193,25 @@ export default function Booking({
               </div>
 
               {/* Travelers & Accommodation */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div className="booking-field-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <div className="form-group">
                   <label>Number of Travelers</label>
                   <div className="days-control">
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => setTravelers(Math.max(1, travelers - 1))}
                     >
                       -
                     </button>
-                    <input 
-                      type="number" 
-                      min="1" 
-                      max="20" 
-                      value={travelers} 
-                      readOnly 
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={travelers}
+                      readOnly
                     />
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => setTravelers(travelers + 1)}
                     >
                       +
@@ -221,7 +221,7 @@ export default function Booking({
 
                 <div className="form-group">
                   <label>Accommodation Tier</label>
-                  <select 
+                  <select
                     value={accommodationTier}
                     onChange={(e) => setAccommodationTier(e.target.value)}
                   >
@@ -235,16 +235,16 @@ export default function Booking({
               {/* Special Requests */}
               <div className="form-group">
                 <label>Special Requests or Notes (Optional)</label>
-                <textarea 
+                <textarea
                   value={specialRequests}
                   onChange={(e) => setSpecialRequests(e.target.value)}
                   placeholder="e.g. Vegetarian/Jain meals, airport pickup, Dal Lake houseboat preference..."
                 ></textarea>
               </div>
 
-              <button 
-                type="submit" 
-                className="primary-button" 
+              <button
+                type="submit"
+                className="primary-button"
                 style={{ width: '100%', padding: '14px', fontSize: '16px' }}
                 disabled={isSubmitting}
               >

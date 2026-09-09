@@ -6,7 +6,7 @@ import {
 import { DESTINATIONS, PACKAGES, TESTIMONIALS } from '../data/travelData';
 import AnimatedCounter from '../components/AnimatedCounter';
 
-export default function Home({ onSelectDestination, onSelectPackage, navigateTo, siteContent, packages = PACKAGES }) {
+export default function Home({ onSelectDestination, onSelectPackage, navigateTo, siteContent, packages = PACKAGES, testimonials = TESTIMONIALS }) {
   const [searchLocation, setSearchLocation] = useState('');
   const [searchDate, setSearchDate] = useState('');
   const [searchGuests, setSearchGuests] = useState('2');
@@ -69,7 +69,12 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo,
   return (
     <div>
       {/* HERO SECTION */}
-      <section className="hero">
+      <section
+        className="hero"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.38)), url("${siteContent?.heroImage || '/travel-bg.jpg'}")`
+        }}
+      >
         <div className="hero-content">
           <p>{siteContent?.heroEyebrow || 'DISCOVER INCREDIBLE INDIA'}</p>
           <h1>{siteContent?.heroTitle || "Explore India's Majestic Wonders & Heritage"}</h1>
@@ -78,14 +83,14 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo,
           </span>
 
           <div className="hero-buttons">
-            <button 
+            <button
               className="primary-button"
               onClick={() => navigateTo('destinations')}
             >
               <Compass size={18} style={{ marginRight: '8px' }} />
               Explore Indian Destinations
             </button>
-            <button 
+            <button
               className="secondary-button"
               onClick={() => navigateTo('packages')}
             >
@@ -93,7 +98,6 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo,
             </button>
           </div>
 
-          {/* Quick Search Widget */}
           <form className="hero-search-box" onSubmit={handleSearchSubmit}>
             <div className="search-field">
               <label><MapPin size={14} color="#0f766e" /> Destination</label>
@@ -130,29 +134,6 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo,
             </button>
           </form>
 
-          {/* Hero Quick Stats Badge */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '25px', marginTop: '30px', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff' }}>
-              <span style={{ fontSize: '20px', fontWeight: 800, color: '#5eead4' }}>
-                <AnimatedCounter target={150} suffix="+" duration={1800} />
-              </span>
-              <span style={{ fontSize: '13px', opacity: 0.9 }}>Destinations</span>
-            </div>
-            <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.3)' }}></div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff' }}>
-              <span style={{ fontSize: '20px', fontWeight: 800, color: '#5eead4' }}>
-                <AnimatedCounter target={28000} suffix="+" duration={2200} formatComma={true} />
-              </span>
-              <span style={{ fontSize: '13px', opacity: 0.9 }}>Happy Travelers</span>
-            </div>
-            <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.3)' }}></div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff' }}>
-              <span style={{ fontSize: '20px', fontWeight: 800, color: '#5eead4' }}>
-                <AnimatedCounter target={4.9} suffix=" / 5.0" decimals={1} duration={1600} />
-              </span>
-              <span style={{ fontSize: '13px', opacity: 0.9 }}>Avg Rating</span>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -246,7 +227,7 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo,
                 </div>
                 <h3>{dest.name}</h3>
                 <p>{dest.description}</p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #f1f5f9' }}>
+                <div className="destination-card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #f1f5f9' }}>
                   <div className="destination-price">
                     From ₹{dest.price.toLocaleString('en-IN')} <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 400 }}>/ person</span>
                   </div>
@@ -410,7 +391,7 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo,
         </div>
 
         <div className="testimonials-grid">
-          {TESTIMONIALS.map((t) => (
+          {testimonials.map((t) => (
             <div key={t.id} className="testimonial-card">
               <div>
                 <div style={{ display: 'flex', gap: '3px', marginBottom: '14px' }}>
@@ -443,11 +424,11 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo,
           <div className="popup-modal" onClick={(e) => e.stopPropagation()}>
             <div className="popup-image-container">
               <img 
-                src="/travel-promo-popup.jpg" 
+                src={siteContent?.popupImage || '/travel-promo-popup.jpg'} 
                 alt="TravelGo Escape to Paradise Special Offer" 
                 className="popup-image"
               />
-              <span className="popup-badge">✨ Limited Time Offer</span>
+              <span className="popup-badge">{siteContent?.popupBadge || '✨ Limited Time Offer'}</span>
               <button 
                 className="popup-close-btn" 
                 onClick={handleClosePopup}
@@ -458,14 +439,14 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo,
             </div>
 
             <div className="popup-body">
-              <h3>Special Festive Offer: Flat ₹2,500 OFF!</h3>
+              <h3>{siteContent?.popupTitle || 'Special Festive Offer: Flat ₹2,500 OFF!'}</h3>
               <p>
-                Book your dream houseboat cruise in Kerala, Kashmir snow retreat, or Royal Rajasthan palace tour today. Use coupon code at checkout:
+                {siteContent?.popupDescription || 'Book your dream houseboat cruise in Kerala, Kashmir snow retreat, or Royal Rajasthan palace tour today. Use coupon code at checkout:'}
               </p>
 
               <div className="promo-code-pill" onClick={handleCopyCode} title="Click to copy promo code">
                 <span>Code:</span>
-                <strong>TRAVELGO2500</strong>
+                <strong>{siteContent?.popupCode || 'TRAVELGO2500'}</strong>
                 <span style={{ fontSize: '12px', color: '#0f766e', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   {copiedCode ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
                   {copiedCode ? 'Copied!' : 'Copy'}
@@ -501,11 +482,11 @@ export default function Home({ onSelectDestination, onSelectPackage, navigateTo,
             style={{ maxWidth: '720px' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ position: 'relative', width: '100%', height: '380px', background: '#000' }}>
+            <div className="lightbox-image-container" style={{ position: 'relative', width: '100%', height: '380px', background: '#000' }}>
               <img 
                 src={lightboxImage.image} 
                 alt={lightboxImage.name} 
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                className="lightbox-image"
               />
               <button 
                 className="popup-close-btn" 

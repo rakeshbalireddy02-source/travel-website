@@ -18,8 +18,8 @@ export default function Footer({ setCurrentPage }) {
         textAlign: 'left'
       }}>
         <div>
-          <div 
-            className="footer-logo" 
+          <div
+            className="footer-logo"
             style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#5eead4' }}
             onClick={() => handleNav('home')}
           >
@@ -60,9 +60,9 @@ export default function Footer({ setCurrentPage }) {
             Get secret travel discounts & exclusive itineraries straight to your inbox.
           </p>
           <form onSubmit={(e) => { e.preventDefault(); alert('Thank you for subscribing to TravelGo deals!'); }} style={{ display: 'flex', gap: '6px' }}>
-            <input 
-              type="email" 
-              placeholder="Your email" 
+            <input
+              type="email"
+              placeholder="Your email"
               required
               style={{
                 flex: 1,
@@ -75,7 +75,7 @@ export default function Footer({ setCurrentPage }) {
                 outline: 'none'
               }}
             />
-            <button 
+            <button
               type="submit"
               style={{
                 background: '#0f766e',

@@ -48,7 +48,7 @@ export default function Destinations({ onSelectDestination, customDestinations =
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div className="destination-filter-controls" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             <div className="search-input-wrapper">
               <Search size={16} />
               <input 
@@ -102,7 +102,7 @@ export default function Destinations({ onSelectDestination, customDestinations =
                 </div>
                 
                 <div className="destination-content">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div className="destination-card-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <span className="badge-tag">{dest.tagline}</span>
                     <div className="rating-pill">
                       <Star size={12} fill="#f59e0b" color="#f59e0b" />
@@ -128,7 +128,7 @@ export default function Destinations({ onSelectDestination, customDestinations =
                     </ul>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '15px', borderTop: '1px solid #f1f5f9' }}>
+                  <div className="destination-card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '15px', borderTop: '1px solid #f1f5f9' }}>
                     <div className="destination-price">
                       From ₹{dest.price.toLocaleString('en-IN')} <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 400 }}>/ person</span>
                     </div>

@@ -18,7 +18,7 @@ export default function About({ navigateTo, siteContent }) {
         <div className="about-container">
           <div className="about-image">
             <img 
-              src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80" 
+              src={siteContent?.aboutImage || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80'} 
               alt="Travelers exploring breathtaking landscape" 
             />
           </div>
@@ -27,15 +27,15 @@ export default function About({ navigateTo, siteContent }) {
             <span style={{ fontSize: '13px', color: '#0f766e', fontWeight: 700, letterSpacing: '1.5px' }}>
               WHO WE ARE
             </span>
-            <h2>Crafting Unforgettable Travel Memories Since 2014</h2>
+            <h2>{siteContent?.aboutStoryTitle || 'Crafting Unforgettable Travel Memories Since 2014'}</h2>
             <p>
-              TravelGo was born from a simple belief: that travel isn't just about visiting new places, but about the profound moments that expand our perspectives and enrich our lives.
+              {siteContent?.aboutStoryOne || "TravelGo was born from a simple belief: that travel isn't just about visiting new places, but about the profound moments that expand our perspectives and enrich our lives."}
             </p>
             <p>
-              Over the past decade, we have grown into a premier global travel collective, having curated extraordinary journeys for over 28,000 discerning travelers across 150+ breathtaking destinations.
+              {siteContent?.aboutStoryTwo || 'Over the past decade, we have grown into a premier global travel collective, having curated extraordinary journeys for over 28,000 discerning travelers across 150+ breathtaking destinations.'}
             </p>
             <p>
-              From private overwater bungalows in the Maldives and secluded chalets in the Swiss Alps to authentic cultural immersions in Kyoto, our expert concierges design each itinerary with meticulous craftsmanship.
+              {siteContent?.aboutStoryThree || 'From private overwater bungalows in the Maldives and secluded chalets in the Swiss Alps to authentic cultural immersions in Kyoto, our expert concierges design each itinerary with meticulous craftsmanship.'}
             </p>
 
             <button 

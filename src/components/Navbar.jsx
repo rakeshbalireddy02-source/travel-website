@@ -55,7 +55,7 @@ export default function Navbar({ currentPage, setCurrentPage, currentUser, onLog
           className={currentPage === 'contact' ? 'active' : ''} 
           onClick={(e) => { e.preventDefault(); handleNavClick('contact'); }}
         >
-          Contact
+          Contact Us
         </a>
         <a 
           href="#my-bookings" 
@@ -65,6 +65,24 @@ export default function Navbar({ currentPage, setCurrentPage, currentUser, onLog
           My Bookings
           {bookingsCount > 0 && <span className="nav-badge">{bookingsCount}</span>}
         </a>
+        <button
+          type="button"
+          className="mobile-panel-booknow"
+          onClick={() => handleNavClick('booking')}
+        >
+          <Luggage size={16} />
+          Book Now
+        </button>
+        {currentUser && (
+          <button
+            type="button"
+            className="mobile-panel-logout"
+            onClick={() => { onLogout(); setMobileMenuOpen(false); }}
+          >
+            <LogOut size={16} />
+            Logout
+          </button>
+        )}
       </nav>
 
       <div className="nav-actions">
@@ -74,7 +92,6 @@ export default function Navbar({ currentPage, setCurrentPage, currentUser, onLog
               <User size={16} color="#0f766e" />
               <span>{currentUser.name}</span>
             </div>
-            {currentUser.isAdmin && <button className="secondary-button" style={{ padding: '8px 14px', fontSize: '13px' }} onClick={() => handleNavClick('admin')}>Admin Panel</button>}
             <button className="logout-button" onClick={onLogout} title="Sign Out">
               <span className="logout-icon"><LogOut size={16} /></span>
               <span>Logout</span>
