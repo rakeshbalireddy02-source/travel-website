@@ -2137,7 +2137,7 @@ a {
 
 .admin-page {
   display: flex;
-  min-height: calc(100vh - 78px);
+  min-height: 100vh;
   background: #f8fafc;
 }
 
@@ -2147,6 +2147,10 @@ a {
   padding: 28px 14px;
   background: #0f172a;
   color: #cbd5e1;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .admin-sidebar-brand {
@@ -3019,7 +3023,7 @@ a {
 
 .admin-cms-shell {
   display: flex;
-  min-height: calc(100vh - 72px);
+  min-height: 100vh;
   background: #f8fafc;
   color: #0f172a;
 }
@@ -3036,6 +3040,10 @@ a {
   gap: 20px;
   box-shadow: 4px 0 24px rgba(15, 23, 42, 0.08);
   z-index: 10;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .admin-cms-profile {
