@@ -5,6 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "django": "python django_backend/manage.py runserver 8000",
+    "django:migrate": "python django_backend/manage.py migrate",
+    "django:seed": "python django_backend/manage.py seed_data",
+    "dev:all": "npx concurrently \"npm run dev\" \"npm run django\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

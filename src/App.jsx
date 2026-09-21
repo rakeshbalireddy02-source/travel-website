@@ -13,6 +13,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
 import { DESTINATIONS, PACKAGES, TESTIMONIALS, FAQS, INITIAL_BOOKINGS } from './data/travelData';
+import { apiService } from './services/api';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 const THEMES = {
@@ -293,6 +294,41 @@ function App() {
     }
   }, [currentUser]);
 
+  // Sync initial data from Django REST API if available
+  useEffect(() => {
+    async function loadBackendData() {
+      try {
+        const backendBookings = await apiService.getBookings();
+        if (Array.isArray(backendBookings) && backendBookings.length > 0) {
+          setBookings(backendBookings.map(b => ({
+            ...b,
+            id: b.id || b.booking_id,
+            bookingId: b.booking_id || b.id,
+            userName: b.user_name || b.userName,
+            userEmail: b.user_email || b.userEmail,
+            userPhone: b.user_phone || b.userPhone,
+            travelDate: b.travel_date || b.travelDate,
+            returnDate: b.return_date || b.returnDate,
+            pricePerPerson: b.price_per_person || b.pricePerPerson,
+            totalPrice: b.total_price || b.totalPrice,
+            specialRequests: b.special_requests || b.specialRequests,
+            bookedOn: b.booked_on || b.bookedOn
+          })));
+        }
+      } catch (e) {
+        // Django API offline or using local fallback
+      }
+
+      try {
+        const backendMessages = await apiService.getMessages();
+        if (Array.isArray(backendMessages) && backendMessages.length > 0) {
+          setMessages(backendMessages);
+        }
+      } catch (e) {}
+    }
+    loadBackendData();
+  }, []);
+
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => {
@@ -317,27 +353,68 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleAddBooking = (newBooking) => {
+  const handleAddBooking = async (newBooking) => {
     setBookings(prev => [newBooking, ...prev]);
     showToast(`🎉 Reservation confirmed! Booking ID: ${newBooking.id}`, 'success');
+    
+    // Sync with Django REST API
+    try {
+      await apiService.createBooking({
+        booking_id: newBooking.id,
+        destination: newBooking.destination,
+        package_title: newBooking.packageTitle || newBooking.title || '',
+        user_name: newBooking.userName,
+        user_email: newBooking.userEmail,
+        user_phone: newBooking.userPhone,
+        travel_date: newBooking.travelDate,
+        return_date: newBooking.returnDate,
+        travelers: newBooking.travelers,
+        tier: newBooking.tier || '',
+        price_per_person: newBooking.pricePerPerson || 0,
+        total_price: newBooking.totalPrice || 0,
+        status: newBooking.status || 'Confirmed',
+        booked_on: newBooking.bookedOn || new Date().toISOString().split('T')[0],
+        special_requests: newBooking.specialRequests || ''
+      });
+    } catch (err) {
+      console.warn('Booking saved locally. Django sync offline:', err);
+    }
   };
 
-  const handleCancelBooking = (bookingId) => {
+  const handleCancelBooking = async (bookingId) => {
     setBookings(prev => prev.filter(b => b.id !== bookingId));
     showToast('Booking cancelled successfully. Full refund initiated.', 'info');
+
+    try {
+      await apiService.deleteBooking(bookingId);
+    } catch (err) {
+      console.warn('Booking cancelled locally. Django sync offline:', err);
+    }
   };
 
-  const handleUpdateBooking = (bookingId, status) => {
+  const handleUpdateBooking = async (bookingId, status) => {
     setBookings(prev => prev.map(booking => booking.id === bookingId ? { ...booking, status } : booking));
+    
+    try {
+      await apiService.updateBooking(bookingId, { status });
+    } catch (err) {
+      console.warn('Booking status updated locally. Django sync offline:', err);
+    }
   };
 
-  const handleAddMessage = (message) => {
+  const handleAddMessage = async (message) => {
     setMessages(prev => [message, ...prev]);
+    try {
+      await apiService.sendMessage(message);
+    } catch (err) {
+      console.warn('Message saved locally. Django sync offline:', err);
+    }
   };
 
   const handleDeleteMessage = (messageId) => {
     setMessages(prev => prev.filter(message => message.id !== messageId));
   };
+
 
   const handleAddCustomDestination = (destination) => {
     setCustomDestinations(prev => [destination, ...prev]);
