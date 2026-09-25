@@ -9,7 +9,7 @@ export default function Login({ onLogin, navigateTo }) {
     e.preventDefault();
     if (email === 'admin@travelgo.in' && password === 'TravelGoAdmin2026!') {
       onLogin({ name: 'Rakesh Reddy', email, isAdmin: true });
-      navigateTo('admin');
+      window.location.href = '/admin/login/';
       return;
     }
 
@@ -21,12 +21,6 @@ export default function Login({ onLogin, navigateTo }) {
   };
 
   const handleDemoFill = (type) => {
-    if (type === 'admin') {
-      setEmail('admin@travelgo.in');
-      setPassword('TravelGoAdmin2026!');
-      return;
-    }
-
     if (type === 'rakesh') {
       setEmail('rakesh.reddy@example.com');
       setPassword('secureTravel2026');
@@ -81,11 +75,8 @@ export default function Login({ onLogin, navigateTo }) {
         </form>
 
         <div className="demo-account-box">
-          <p>Quick 1-Click Demo Accounts:</p>
+          <p>Quick Demo Accounts:</p>
           <div className="demo-btn-group">
-            <button type="button" className="demo-btn" onClick={() => handleDemoFill('admin')}>
-              Admin Access
-            </button>
             <button type="button" className="demo-btn" onClick={() => handleDemoFill('rakesh')}>
               Rakesh Reddy (VIP)
             </button>
@@ -93,9 +84,6 @@ export default function Login({ onLogin, navigateTo }) {
               Ananya Iyer
             </button>
           </div>
-          <p style={{ marginTop: '12px', fontSize: '12px', color: '#475569' }}>
-            Admin login: <strong>admin@travelgo.in</strong> / <strong>TravelGoAdmin2026!</strong>
-          </p>
         </div>
 
         <div className="auth-footer">

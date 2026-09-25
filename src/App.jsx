@@ -11,7 +11,6 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Admin from './pages/Admin';
 import { DESTINATIONS, PACKAGES, TESTIMONIALS, FAQS, INITIAL_BOOKINGS } from './data/travelData';
 import { apiService } from './services/api';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
@@ -620,62 +619,8 @@ function App() {
           <Contact onAddMessage={handleAddMessage} siteContent={siteContent} faqs={faqs} />
         )}
 
-        {currentPage === 'admin' && currentUser?.isAdmin && (
-          <Admin
-            bookings={bookings}
-            messages={messages}
-            testimonials={testimonials}
-            faqs={faqs}
-            onAddTestimonial={(testimonial) => {
-              setTestimonials(prev => [testimonial, ...prev]);
-            }}
-            onUpdateTestimonial={(testimonialId, updatedTestimonial) => {
-              setTestimonials(prev => prev.map(testimonial => (
-                testimonial.id === testimonialId
-                  ? { ...testimonial, ...updatedTestimonial }
-                  : testimonial
-              )));
-            }}
-            onDeleteTestimonial={(testimonialId) => {
-              setTestimonials(prev => prev.filter(testimonial => testimonial.id !== testimonialId));
-            }}
-            onAddFaq={(faq) => {
-              setFaqs(prev => [faq, ...prev]);
-            }}
-            onUpdateFaq={(faqId, updatedFaq) => {
-              setFaqs(prev => prev.map(faq => faq.id === faqId ? { ...faq, ...updatedFaq } : faq));
-            }}
-            onDeleteFaq={(faqId) => {
-              setFaqs(prev => prev.filter(faq => faq.id !== faqId));
-            }}
-            onUpdateBooking={handleUpdateBooking}
-            onDeleteMessage={handleDeleteMessage}
-            onLogout={handleLogout}
-            siteContent={siteContent}
-            onUpdateContent={setSiteContent}
-            blogPosts={customDestinations}
-            onAddBlogPost={handleAddCustomDestination}
-            onUpdateBlogPost={handleUpdateCustomDestination}
-            onDeleteBlogPost={handleDeleteCustomDestination}
-            destinations={[...managedDestinations, ...customDestinations]}
-            removedDestinationIds={removedDestinationIds}
-            onDeleteDestination={handleDeleteDestination}
-            onUpdateDestination={handleUpdateDestination}
-            onRestoreDestination={handleRestoreDestination}
-            packages={allAdminPackages}
-            removedPackageIds={removedPackageIds}
-            onAddPackage={handleAddCustomPackage}
-            onUpdatePackage={handleUpdatePackage}
-            onDeletePackage={handleDeletePackage}
-            onRestorePackage={handleRestorePackage}
-            themes={THEMES}
-            currentTheme={selectedTheme}
-            onChangeTheme={setSelectedTheme}
-          />
-        )}
-
-        {currentPage === 'admin' && !currentUser?.isAdmin && (
-          <Login onLogin={handleLogin} navigateTo={handleNavigate} />
+        {currentPage === 'admin' && (
+          <script dangerouslySetInnerHTML={{ __html: 'window.location.href = "/admin/login/";' }} />
         )}
 
         {currentPage === 'login' && (
