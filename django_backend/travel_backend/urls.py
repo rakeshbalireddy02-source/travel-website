@@ -19,8 +19,15 @@ from django.urls import path, include, re_path
 from django.views.generic import TemplateView
 from django.views.static import serve
 from django.conf import settings
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+def custom_admin_logout(request):
+    logout(request)
+    return redirect('/admin/login/')
 
 urlpatterns = [
+    path('admin/logout/', custom_admin_logout),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     re_path(r'^assets/(?P<path>.*)$', serve, {'document_root': settings.BASE_DIR.parent / 'dist' / 'assets'}),

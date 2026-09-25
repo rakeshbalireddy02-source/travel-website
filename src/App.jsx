@@ -73,7 +73,7 @@ function App() {
   });
   const [selectedItemForBooking, setSelectedItemForBooking] = useState(null);
   const [selectedTheme, setSelectedTheme] = useState('ocean');
-  
+
   // Bookings state with local storage fallback
   const [bookings, setBookings] = useState(() => {
     try {
@@ -323,7 +323,7 @@ function App() {
         if (Array.isArray(backendMessages) && backendMessages.length > 0) {
           setMessages(backendMessages);
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     loadBackendData();
   }, []);
@@ -355,7 +355,7 @@ function App() {
   const handleAddBooking = async (newBooking) => {
     setBookings(prev => [newBooking, ...prev]);
     showToast(`🎉 Reservation confirmed! Booking ID: ${newBooking.id}`, 'success');
-    
+
     // Sync with Django REST API
     try {
       await apiService.createBooking({
@@ -393,7 +393,7 @@ function App() {
 
   const handleUpdateBooking = async (bookingId, status) => {
     setBookings(prev => prev.map(booking => booking.id === bookingId ? { ...booking, status } : booking));
-    
+
     try {
       await apiService.updateBooking(bookingId, { status });
     } catch (err) {
@@ -553,8 +553,8 @@ function App() {
     <div className="travelgo-app" style={appThemeStyle}>
       {/* Navigation Bar */}
       {currentPage !== 'login' && currentPage !== 'admin' && (
-        <Navbar 
-          currentPage={currentPage} 
+        <Navbar
+          currentPage={currentPage}
           setCurrentPage={handleNavigate}
           currentUser={currentUser}
           onLogout={handleLogout}
@@ -565,7 +565,7 @@ function App() {
       {/* Main Page Routing */}
       <main style={{ flex: 1 }}>
         {currentPage === 'home' && (
-          <Home 
+          <Home
             onSelectDestination={handleSelectDestination}
             onSelectPackage={handleSelectPackage}
             navigateTo={handleNavigate}
@@ -576,21 +576,21 @@ function App() {
         )}
 
         {currentPage === 'destinations' && (
-          <Destinations 
+          <Destinations
             onSelectDestination={handleSelectDestination}
             customDestinations={visibleDestinations}
           />
         )}
 
         {currentPage === 'packages' && (
-          <Packages 
+          <Packages
             onSelectPackage={handleSelectPackage}
             packages={visiblePackages}
           />
         )}
 
         {currentPage === 'booking' && (
-          <Booking 
+          <Booking
             initialItem={selectedItemForBooking}
             currentUser={currentUser}
             onAddBooking={handleAddBooking}
@@ -601,7 +601,7 @@ function App() {
         )}
 
         {currentPage === 'my-bookings' && (
-          <MyBookings 
+          <MyBookings
             bookings={bookings}
             onCancelBooking={handleCancelBooking}
             navigateTo={handleNavigate}
@@ -609,7 +609,7 @@ function App() {
         )}
 
         {currentPage === 'about' && (
-          <About 
+          <About
             navigateTo={handleNavigate}
             siteContent={siteContent}
           />
@@ -624,14 +624,14 @@ function App() {
         )}
 
         {currentPage === 'login' && (
-          <Login 
+          <Login
             onLogin={handleLogin}
             navigateTo={handleNavigate}
           />
         )}
 
         {currentPage === 'register' && (
-          <Register 
+          <Register
             onLogin={handleLogin}
             navigateTo={handleNavigate}
           />
@@ -648,7 +648,7 @@ function App() {
           {toast.type === 'error' && <AlertCircle size={20} color="#ef4444" />}
           {toast.type === 'info' && <Info size={20} color="#0f766e" />}
           <span style={{ fontSize: '14px', fontWeight: 500 }}>{toast.message}</span>
-          <button 
+          <button
             onClick={() => setToast(null)}
             style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', marginLeft: 'auto', padding: '2px' }}
           >
